@@ -6,12 +6,31 @@ const pageWidth = window.innerWidth;
 canvas.height = pageHeight;
 canvas.width = pageWidth;
 
-const water = new Image(381,100);
+const water = new Image();
 water.src = "../Assets/Water.png";
+water.onload = function() {
+    ctx.drawImage(water,canvas.width - water.width,0,resizeWidth(water.width),resizeHeight(water.height));
+};
+
+const base = new Image();
+base.src = "../Assets/Homebase.png";
+base.onload = function() {
+    ctx.drawImage(base,0,water.height/10,resizeWidth(base.width),resizeHeight(base.height));
+};
+
+console.log(resizeHeight(base.height)/canvas.height);
 
 
-const img = document.getElementById("Water");
-ctx.drawImage(img,0,0);
 
 
-console.log(canvas.height, canvas.width, pageHeight, pageWidth);
+
+function displayBase() {
+    ctx.drawImage(base,100,100);
+}
+
+function resizeWidth(x) {
+    return x/1920 * canvas.width;
+}
+function resizeHeight(y) {
+    return y/1080 * canvas.height;
+}
