@@ -3,26 +3,15 @@ const ctx = canvas.getContext("2d");
 
 const pageHeight = window.innerHeight;
 const pageWidth = window.innerWidth;
+canvas.height = pageHeight;
+canvas.width = pageWidth;
+
+const water = new Image(381,100);
+water.src = "../Assets/Water.png";
 
 
-const image = {
-    img: 0,
-    width: 0,
-    height:0
-};
+const img = document.getElementById("Water");
+ctx.drawImage(img,0,0);
 
-const images = {
-    "Water": document.getElementById("Water")
-};
 
-function resizeX(x) {
-    return (x.width/1920) * pageWidth;
-}
-
-function resizeY(y) {
-    return (y.height/1080) * pageHeight;
-}
-
-ctx.drawImage(images["Water"],0,0);
-
-console.log(canvas.height, canvas.width, images["Water"].width, images["Water"].height);
+console.log(canvas.height, canvas.width, pageHeight, pageWidth);
