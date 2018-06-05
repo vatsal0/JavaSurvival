@@ -5,32 +5,24 @@ const pageHeight = window.innerHeight;
 const pageWidth = window.innerWidth;
 
 
-console.log(canvas.height,canvas.width);
+const image = {
+    img: 0,
+    width: 0,
+    height:0
+};
 
 const images = {
     "Water": document.getElementById("Water")
 };
 
-const image = {
-    src: "Image Source Placeholder",
-    width: 0,
-    height:0
+function resizeX(x) {
+    return (x.width/1920) * pageWidth;
 }
 
-
-function resizeToFitPage(image) {
-    image.width = (image.width/1920)  * pageWidth;
-    image.height = (image.height/1080) * pageHeight;
+function resizeY(y) {
+    return (y.height/1080) * pageHeight;
 }
-
-
-const person = {
-    firstName: "John",
-    lastName : "Doe",
-    id       : 5566,
-    fullName : function() {
-        return this.firstName + " " + this.lastName;
-    }
-};
 
 ctx.drawImage(images["Water"],0,0);
+
+console.log(canvas.height, canvas.width, images["Water"].width, images["Water"].height);
