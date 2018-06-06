@@ -6,32 +6,20 @@ const pageWidth = window.innerWidth;
 canvas.height = pageHeight;
 canvas.width = pageWidth;
 
-const water = new Image();
-water.src = "../Assets/Water.png";
-water.onload = function() {
+const water = createImage("../Assets/Water.png",function() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
-};
+});
 
-const base = createImage("../Assets/Homebase.png")
-
-base.onload = function() {
+const base = createImage("../Assets/Homebase.png", function() {
     ctx.drawImage(base,0,canvas.height/10,resizeWidth(base.width),resizeHeight(base.height));
-};
+});
 
-const troopButton = new Image();
-troopButton.src = "../Assets/TroopButton.png";
-troopButton.onload = function(){
+
+const troopButton = createImage("../Assets/TroopButton.png", function(){
     for (let i = 0; i < 800; i+= 200) {
         ctx.drawImage(troopButton, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200))
     }
-
-};
-
-
-console.log(resizeHeight(base.height)/canvas.height);
-
-
-
+});
 
 function displayBase() {
     ctx.drawImage(base,100,100);
@@ -52,3 +40,4 @@ function createImage(src,onload) {
     }
     return img;
 }
+
