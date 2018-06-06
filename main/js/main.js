@@ -12,7 +12,7 @@ water.onload = function() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
 };
 
-const base = createImage("../Assets/Homebase.png")
+const base = createImage("../Assets/Homebase.png");
 
 base.onload = function() {
     ctx.drawImage(base,0,canvas.height/10,resizeWidth(base.width),resizeHeight(base.height));
