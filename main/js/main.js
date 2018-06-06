@@ -33,3 +33,11 @@ function resizeWidth(x) {
 function resizeHeight(y) {
     return y/1080 * canvas.height;
 }
+
+function createImage(src,onload) {
+    let img = new Image();
+    img.src = src;
+    if (onload) {
+        img.onload = onload;
+    }
+}
