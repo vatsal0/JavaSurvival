@@ -21,7 +21,6 @@ base.onload = function() {
 console.log(resizeHeight(base.height)/canvas.height);
 
 
-function
 
 
 function displayBase() {
