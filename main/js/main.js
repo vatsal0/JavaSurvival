@@ -13,6 +13,7 @@ water.onload = function() {
 };
 
 const base = createImage("../Assets/Homebase.png")
+
 base.onload = function() {
     ctx.drawImage(base,0,canvas.height/10,resizeWidth(base.width),resizeHeight(base.height));
 };
@@ -21,14 +22,16 @@ const troopButton = new Image();
 troopButton.src = "../Assets/TroopButton.png";
 troopButton.onload = function(){
     for (let i = 0; i < 800; i+= 200) {
-        ctx.drawImage(troopButton, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
-        ctx.font = "30px Arial";
-        ctx.fillText(i,resizeWidth(634 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
+        ctx.drawImage(troopButton, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200))
     }
+
 };
 
 
 console.log(resizeHeight(base.height)/canvas.height);
+
+
+
 
 function displayBase() {
     ctx.drawImage(base,100,100);
