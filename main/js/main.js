@@ -22,7 +22,9 @@ const troopButton = new Image();
 troopButton.src = "../Assets/TroopButton.png";
 troopButton.onload = function(){
     for (let i = 0; i < 800; i+= 200) {
-        ctx.drawImage(troopButton, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200))
+        ctx.drawImage(troopButton, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
+        ctx.font = "25px Arial";
+        ctx.fillText(i, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
     }
 
 };
