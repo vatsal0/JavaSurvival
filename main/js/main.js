@@ -6,6 +6,9 @@ const pageWidth = window.innerWidth;
 canvas.height = pageHeight;
 canvas.width = pageWidth;
 
+var money = 200;
+//soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
+
 const water = createImage("../Assets/Water.png",function() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
 });
@@ -59,3 +62,13 @@ function createImage(src,onload) {
     return img;
 }
 
+function draw() {
+    //go through a table of friendly and enemy troops and draw them based on position
+
+
+
+    //update money value
+}
+
+
+setInterval(draw, 10);
