@@ -25,12 +25,12 @@ const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
 const fireIntervals = {"Soldier": .4, "Sniper": 5, "Gunner": .1, "Rocket Launcher": 2};
 const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 400, "Rocket Launcher" : 150};
 const damages = {"Soldier": 25, "Sniper": 250, "Gunner": 10, "Rocket Launcher" : 100};
+const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 250, "Rocket Launcher" : 600};
 let lastDeployed = Date.now();
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
-const round2 = {"Soldier": 20, "Sniper": 10};
 /*
 Round 1:
 30 Soldiers
@@ -84,6 +84,7 @@ function Troop(side, type, x, y, dx, dy, targetX, targetY) {
     this.maxHealth = healths[type];
     this.health = this.maxHealth;
     this.damage = damages[type];
+    this.range = ranges[type];
 }
 
 function Raft(img, x, y) {
