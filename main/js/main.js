@@ -1,3 +1,53 @@
+//Get canvas from html
+const canvas = document.getElementById("game");
+const ctx = canvas.getContext("2d");
+
+//Resize canvas to perfectly fit given space
+const pageHeight = window.innerHeight;
+const pageWidth = window.innerWidth;
+canvas.height = pageHeight;
+canvas.width = pageWidth;
+
+//Define variables for image loading
+const imagesCount = 21;
+let imagesLoaded = 0;
+
+//Define tables for troops
+const friendlies = [];
+const enemies = [];
+let rafts = [];
+
+//Define variables that will help with troop selection and deployment
+let money = 4000;
+let currentTroop = 1;
+const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
+const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
+const fireIntervals = {"Soldier": .4, "Sniper": 5, "Gunner": .1, "Rocket Launcher": 2};
+const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 400, "Rocket Launcher" : 150};
+const damages = {"Soldier": 25, "Sniper": 250, "Gunner": 10, "Rocket Launcher" : 100};
+let lastDeployed = Date.now();
+//soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
+
+
+const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
+const round2 = {"Soldier": 20, "Sniper": 10};
+/*
+Round 1:
+30 Soldiers
+
+Round 2:
+20 Soldiers, 10 Snipers
+
+Round 3: 10 Soldiers, 10 Snipers, 20 Gunners
+
+Round 4: 30 Gunners, 20 Snipers, 10 Rocket Launchers
+
+Round 5: 40 Gunners, 40 Rocket Launchers
+ */
+
+//Image glow is defined here to prevent scope problems
+let glow;
+
 //Basic functions that will be used for game mechanics
 function resizeWidth(x) {
     return x/1920 * canvas.width;
@@ -11,16 +61,16 @@ function distance(x1, y1, x2, y2) {
 }
 
 //Defining object constructors
-function createImage(src,onload) {
+function createImage(src,func) {
     let img = new Image();
     img.src = src;
-    if (onload) {
-        img.onload = onload;
+    if (func) {
+        img.onload = func;
     }
     return img;
 }
 
-function Troop(side, type, x, y, dx, dy, targetX, targetY, fireInterval=1, projectile="bullet") {
+function Troop(side, type, x, y, dx, dy, targetX, targetY) {
     this.side = side;
     this.type = type;
     this.x = x;
@@ -30,8 +80,16 @@ function Troop(side, type, x, y, dx, dy, targetX, targetY, fireInterval=1, proje
     this.targetX = targetX;
     this.targetY = targetY;
     this.lastShot  = Date.now();
-    this.fireInterval = fireInterval;
-    this.projectile = projectile;
+    this.fireInterval = fireIntervals[type];
+    this.maxHealth = healths[type];
+    this.health = this.maxHealth;
+    this.damage = damages[type];
+}
+
+function Raft(img, x, y) {
+    this.img = img;
+    this.x = x;
+    this.y = y;
 }
 
 function Projectile(targetx, targety, speed, aoe, damage) {
@@ -41,35 +99,6 @@ function Projectile(targetx, targety, speed, aoe, damage) {
     this.aoe = aoe;
     this.damage = damage;
 }
-
-//Get canvas from html
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
-
-//Resize canvas to perfectly fit given space
-const pageHeight = window.innerHeight;
-const pageWidth = window.innerWidth;
-canvas.height = pageHeight;
-canvas.width = pageWidth;
-
-//Define variables for image loading
-const imagesCount = 12;
-let imagesLoaded = 0;
-
-//Define tables for troops
-const friendlies = [];
-const enemies = [];
-
-//Define variables that will help with troop selection and deployment
-let money = 14641;
-let currentTroop = 1;
-const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
-const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
-let lastDeployed = Date.now();
-//soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
-
-//Image glow is defined here to prevent scope problems
-let glow = 0;
 
 //Define background components and images
 let water = createImage("../Assets/Water.png",function() {
@@ -120,7 +149,7 @@ let iconRocketLauncher = createImage("../Assets/Icons/Rocket Launcher.png", func
 //Define images for friendly and enemy troops
 let friendlySoldier = createImage("../Assets/Friendlies/Soldier.png", function () {
     imagesLoaded++;
-})
+});
 let friendlySniper = createImage("../Assets/Friendlies/Sniper.png", function () {
     imagesLoaded++;
 });
@@ -131,6 +160,33 @@ let friendlyRocketLauncher = createImage("../Assets/Friendlies/Rocket Launcher.p
     imagesLoaded++;
 });
 let enemySoldier = createImage("../Assets/Enemies/Soldier.png", function () {
+    imagesLoaded++;
+});
+let enemySniper = createImage("../Assets/Enemies/Sniper.png", function () {
+    imagesLoaded++;
+});
+let enemyGunner = createImage("../Assets/Enemies/Gunner.png", function () {
+    imagesLoaded++;
+});
+let enemyRocketLauncher = createImage("../Assets/Enemies/Rocket Launcher.png", function () {
+    imagesLoaded++;
+});
+let barOutline = createImage("../Assets/Health/BarOutline.png", function () {
+    imagesLoaded++;
+});
+let bar = createImage("../Assets/Health/Bar.png", function () {
+    imagesLoaded++;
+});
+let raft1 = createImage("../Assets/Rafts/Raft1.png", function () {
+    imagesLoaded++;
+});
+let raft2 = createImage("../Assets/Rafts/Raft2.png", function () {
+    imagesLoaded++;
+});
+let raft3 = createImage("../Assets/Rafts/Raft3.png", function () {
+    imagesLoaded++;
+});
+let raft4 = createImage("../Assets/Rafts/Raft4.png", function () {
     imagesLoaded++;
 });
 
@@ -162,7 +218,6 @@ function drawBackgroundElements() {
 function drawTroop(troop){
     let rot = Math.atan(troop.dy/troop.dx);
     if (troop.side === "Friendly") {
-        let rot = Math.atan(troop.dy/troop.dx);
         let img = friendlySoldier;
         if (troop.type === "Sniper"){
             img = friendlySniper;
@@ -175,15 +230,36 @@ function drawTroop(troop){
         ctx.rotate(rot);
         ctx.drawImage(img, resizeWidth(-25), resizeHeight(-25),resizeWidth(img.width), resizeHeight(img.height));
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-
+        let healthRatio = troop.health/troop.maxHealth;
+        let currentStyle = ctx.fillStyle;
+        let g = 255 * healthRatio;
+        let r = 255-g;
+        ctx.fillStyle = "rgb(" + r + "," + g + ",0)";
+        ctx.drawImage(barOutline, resizeWidth(troop.x - 5), resizeHeight(troop.y - 20), resizeWidth(barOutline.width), resizeHeight(barOutline.height));
+        ctx.fillRect(resizeWidth(troop.x - 4), resizeHeight(troop.y - 21), resizeWidth(bar.width)*healthRatio, resizeHeight(bar.height));
+        ctx.fillStyle = currentStyle;
     }
     if (troop.side === "Enemy") {
-        if (troop.type === "Soldier"){
-            ctx.translate(resizeWidth(troop.x+enemySoldier.width-25),resizeHeight(troop.y+enemySoldier.height-25));
-            ctx.rotate(rot);
-            ctx.drawImage(enemySoldier, resizeWidth(25-enemySoldier.width), resizeHeight(25-enemySoldier.height),resizeWidth(enemySoldier.width), resizeHeight(enemySoldier.height));
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
+        let img = enemySoldier;
+        if (troop.type === "Sniper"){
+            img = enemySniper;
+        } else if (troop.type === "Gunner") {
+            img = enemyGunner;
+        } else if (troop.type === "Rocket Launcher") {
+            img = enemyRocketLauncher;
         }
+        ctx.translate(resizeWidth(troop.x+img.width-25),resizeHeight(troop.y+img.height-25));
+        ctx.rotate(-rot);
+        ctx.drawImage(img, resizeWidth(25-img.width), resizeHeight(25-img.height),resizeWidth(img.width), resizeHeight(img.height));
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        let healthRatio = troop.health/troop.maxHealth;
+        let currentStyle = ctx.fillStyle;
+        let g = 255 * healthRatio;
+        let r = 255-g;
+        ctx.fillStyle = "rgb(" + r + "," + g + ",0)";
+        ctx.drawImage(barOutline, resizeWidth(troop.x + img.width - 55), resizeHeight(troop.y - 20), resizeWidth(barOutline.width), resizeHeight(barOutline.height));
+        ctx.fillRect(resizeWidth(troop.x + img.width - 54), resizeHeight(troop.y - 21), resizeWidth(bar.width)*healthRatio, resizeHeight(bar.height));
+        ctx.fillStyle = currentStyle;
     }
 }
 
@@ -204,12 +280,12 @@ function onClickHandler(e) {
 
         if (targetX > 480 && targetX < 1440 && targetY < 880) {
             console.log(targetX,targetY);
-            let dx = 1;
+            let dx = 2;
             if (targetY > 540) {
-                let dy = -(766-targetY)/(targetX-512);
+                let dy = -2 * (766-targetY)/(targetX-512);
                 friendlies.push(new Troop("Friendly", troops[currentTroop],512,766,dx,dy,targetX, targetY));
             } else {
-                let dy = -(258-targetY)/(targetX-512);
+                let dy = -2 * (258-targetY)/(targetX-512);
                 friendlies.push(new Troop("Friendly", troops[currentTroop],512,258,dx,dy,targetX, targetY));
             }
             money -= costs[currentTroop];
@@ -223,14 +299,25 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
-        friendlies.forEach(function(item, index, array) {
+        friendlies.forEach(function(item) {
             drawTroop(item);
             if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
                 item.x += item.dx;
                 item.y += item.dy;
             }
 
-        })
+        });
+       enemies.forEach(function(item) {
+            drawTroop(item);
+            if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
+                item.x += item.dx;
+                item.y -= item.dy;
+            }
+
+        });
+        rafts.forEach(function(item) {
+            ctx.drawImage(item.img, resizeWidth(item.x), resizeHeight(item.y), resizeWidth(raft1.width), resizeHeight(raft1.height));
+        });
     }
 
     //go through a table of friendly and enemy troops and draw them based on position
@@ -238,5 +325,33 @@ function draw() {
     //update money value
 }
 
-
 setInterval(draw, 100);
+
+
+let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Launcher": raft4};
+let enemyTroopsList = {"Soldier": enemySoldier, "Sniper": enemySniper, "Gunner": enemyGunner, "Rocket Launcher": enemyRocketLauncher};
+setTimeout(function() {
+    rafts = [];
+    let raftTroops = [];
+    //[[Soldier,30], [Sniper,10]]
+    for (let i=0; i < round1.length; i++) {
+        raftTroops.push([round1[i][0], round1[i][1]]);
+    }
+    for (let x=1; x<= raftTroops.length; x++) {
+        let soldierType = raftTroops[x-1][0];
+        let img = raftsList[soldierType];
+        let raftPos = x/(raftTroops.length + 1) * 1080;
+        let troopsDeployed = 0;
+        let troopCount = raftTroops[x-1][1];
+        let deployEnemy = setInterval(function() {
+            troopsDeployed++;
+            if (troopsDeployed === troopCount) {
+                clearInterval(deployEnemy);
+            }
+            let enemyImg = enemyTroopsList[soldierType];
+            enemies.push(new Troop("Enemy", soldierType, 1720 - enemyImg.width, raftPos-25,-2,0,480,raftPos-25));
+        },5000);
+        rafts.push(new Raft(img, 1720, raftPos-40));
+    }
+    //side, type, x, y, dx, dy, targetX, targetY
+}, 1000);
