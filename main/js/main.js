@@ -281,12 +281,12 @@ function onClickHandler(e) {
 
         if (targetX > 480 && targetX < 1440 && targetY < 880) {
             console.log(targetX,targetY);
-            let dx = 2;
+            let dx = .2;
             if (targetY > 540) {
-                let dy = -2 * (766-targetY)/(targetX-512);
+                let dy = -.2 * (766-targetY)/(targetX-512);
                 friendlies.push(new Troop("Friendly", troops[currentTroop],512,766,dx,dy,targetX, targetY));
             } else {
-                let dy = -2 * (258-targetY)/(targetX-512);
+                let dy = -.2 * (258-targetY)/(targetX-512);
                 friendlies.push(new Troop("Friendly", troops[currentTroop],512,258,dx,dy,targetX, targetY));
             }
             money -= costs[currentTroop];
@@ -326,7 +326,7 @@ function draw() {
     //update money value
 }
 
-setInterval(draw, 100);
+setInterval(draw, 10);
 
 
 let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Launcher": raft4};
@@ -350,7 +350,7 @@ setTimeout(function() {
                 clearInterval(deployEnemy);
             }
             let enemyImg = enemyTroopsList[soldierType];
-            enemies.push(new Troop("Enemy", soldierType, 1720 - enemyImg.width, raftPos-25,-2,0,480,raftPos-25));
+            enemies.push(new Troop("Enemy", soldierType, 1720 - enemyImg.width, raftPos-25,-.2,0,480,raftPos-25));
         },5000);
         rafts.push(new Raft(img, 1720, raftPos-40));
     }
