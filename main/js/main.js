@@ -354,5 +354,5 @@ setTimeout(function() {
         },5000);
         rafts.push(new Raft(img, 1720, raftPos-40));
     }
-    //side, type, x, y, dx, dy, targetX, targetY
+    //side, type, x, y, dx, dy, targetX, targetY;
 }, 1000);
