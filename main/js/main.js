@@ -18,7 +18,7 @@ const enemies = [];
 let rafts = [];
 
 //Define variables that will help with troop selection and deployment
-let money = 100;
+let money = 500;
 let currentTroop = 1;
 const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
 const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
