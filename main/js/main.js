@@ -190,6 +190,13 @@ let raft3 = createImage("../Assets/Rafts/Raft3.png", function () {
 let raft4 = createImage("../Assets/Rafts/Raft4.png", function () {
     imagesLoaded++;
 });
+let bullet = createImage("../Assets/Bullet.png", function(){
+    imagesLoaded++;
+});
+let rocket = createImage("../Assets/Rocket.png", function(){
+    imagesLoaded++;
+});
+
 
 //Function to draw all background elements defined above, along with some text objects
 function drawBackgroundElements() {
@@ -217,6 +224,12 @@ function drawBackgroundElements() {
 }
 
 //Function to draw troop based on position, rotation, etc
+
+function drawProjectile(Projectile){
+
+}
+
+
 function drawTroop(troop){
     let rot = Math.atan(troop.dy/troop.dx);
     if (troop.side === "Friendly") {
