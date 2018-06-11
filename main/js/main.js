@@ -213,6 +213,7 @@ function drawBackgroundElements() {
     ctx.fillStyle = "#39BC6D";
     ctx.font = "60px Segoe UI";
     ctx.fillText("$" + money, 0, resizeHeight(1050), resizeWidth(300));
+
 }
 
 //Function to draw troop based on position, rotation, etc
@@ -295,7 +296,9 @@ function onClickHandler(e) {
 }
 
 document.addEventListener("click", onClickHandler, false);
-
+function slow(){
+    money += 10;
+}
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -334,7 +337,7 @@ function draw() {
 
     //update money value
 }
-
+setInterval(slow, 1000);
 setInterval(draw, 10);
 
 
