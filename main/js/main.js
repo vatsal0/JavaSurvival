@@ -298,6 +298,15 @@ document.addEventListener("click", onClickHandler, false);
 
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (var i = 0; i < friendlies.length; i++) {
+        for (let j = 0; j < enemies.length; j++) {
+            if(distance(friendlies[i].x, friendlies[i].y, enemies[j].x, enemies[j].y) < friendlies[i].range){
+                new Projectile();
+            }
+        }
+    }
+
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
         friendlies.forEach(function(item) {
