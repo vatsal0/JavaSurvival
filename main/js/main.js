@@ -34,16 +34,22 @@ let lastDeployed = Date.now();
 
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
+const round2 = [["Soldier",10],["Sniper",5],["Soldier",10],["Sniper", 5]];
+const round3 = [["Gunner",10],["Soldier",10], ["Sniper",10], ["Gunner",10]];
+const round4 = [["Gunner",10],["Sniper",10]["Rocket Launcher",10], ["Sniper",10], ["Gunner",10]];
+const round5 = [["Gunner",20], ["Rocket Launcher",20], ["Gunner",20], ["Rocket Launcher",20]];
+
+const rounds = [round1, round2, round3, round4, round5];
 /*
 Round 1:
-30 Soldiers
+20 Soldiers
 
 Round 2:
 20 Soldiers, 10 Snipers
 
 Round 3: 10 Soldiers, 10 Snipers, 20 Gunners
 
-Round 4: 30 Gunners, 20 Snipers, 10 Rocket Launchers
+Round 4: 20 Gunners, 20 Snipers, 10 Rocket Launchers
 
 Round 5: 40 Gunners, 40 Rocket Launchers
  */
