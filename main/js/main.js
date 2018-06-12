@@ -242,6 +242,41 @@ function drawBackgroundElements() {
 //Function to draw troop based on position, rotation, etc
 
 function drawProjectile(Projectile){
+    let rot = Math.atan(Projectile.dx/Projectile.dy);
+    if(Projectile.side === "Friendly"){
+        if(Projectile.type === "Bullet"){
+            img = bullet;
+            ctx.translate(resizeWidth(Projectile.x), resizeHeight(Projectile.y));
+            ctx.rotate(rot);
+            ctx.drawImage(img, resizeWidth(), resizeHeight(), resizeWidth(img.width), resizeHeight(img.height));
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            projectiles.forEach(function(P) {
+                enemies.forEach(function(enemy){
+                    if (distance(P.x, P.y,enemy.x, enemy.y) < P.aoe) {
+                        enemy.health -= P.damage;
+                    }
+                });
+            });
+        }
+        else if(Projectile.type === "Rocket"){
+            img = rocket;
+            ctx.translate(resizeWidth(P.x), resizeHeight(Projectile.y));
+            ctx.rotate(rot);
+            ctx.drawImage(img, resizeWidth(), resizeHeight(), resizeWidth(img.width), resizeHeight(img.height));
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            projectiles.forEach(function(P) {
+                enemies.forEach(function(enemy){
+                    if (distance(P.x, P.y,enemy.x, enemy.y) < P.aoe) {
+                        enemy.health -= P.damage;
+                    }
+                });
+            });
+        }
+
+    }
+    if(troop.side === "Enemy"){
+        let img = Projectile
+    }
 
 }
 
