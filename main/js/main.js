@@ -15,7 +15,9 @@ let imagesLoaded = 0;
 //Define tables for troops
 const friendlies = [];
 const enemies = [];
+const projectiles = [];
 let rafts = [];
+
 
 //Define variables that will help with troop selection and deployment
 let money = 500;
@@ -26,6 +28,7 @@ const fireIntervals = {"Soldier": .4, "Sniper": 5, "Gunner": .1, "Rocket Launche
 const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 400, "Rocket Launcher" : 150};
 const damages = {"Soldier": 25, "Sniper": 250, "Gunner": 10, "Rocket Launcher" : 100};
 const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 250, "Rocket Launcher" : 600};
+
 let lastDeployed = Date.now();
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
@@ -93,12 +96,15 @@ function Raft(img, x, y) {
     this.y = y;
 }
 
-function Projectile(targetx, targety, speed, aoe, damage) {
-    this.targety = targetx;
-    this.targety = targety;
-    this.speed = speed;
+function Projectile(side, type, dx, dy, speed, aoe, damage) {
+    this.side = side;
+    this.type = type;
+    this.state = "active";
+    this.dx = dx;
+    this.dy = dy;
     this.aoe = aoe;
     this.damage = damage;
+
 }
 
 //Define background components and images
@@ -190,6 +196,17 @@ let raft3 = createImage("../Assets/Rafts/Raft3.png", function () {
 let raft4 = createImage("../Assets/Rafts/Raft4.png", function () {
     imagesLoaded++;
 });
+let bullet = createImage("../Assets/Bullet.png", function(){
+    imagesLoaded++;
+});
+let rocket = createImage("../Assets/Rocket.png", function(){
+    imagesLoaded++;
+});
+
+
+let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Launcher": raft4};
+let friendlyTroopsList = {"Soldier": friendlySoldier, "Sniper": friendlySniper, "Gunner": friendlyGunner, "Rocket Launcher": friendlyRocketLauncher};
+let enemyTroopsList = {"Soldier": enemySoldier, "Sniper": enemySniper, "Gunner": enemyGunner, "Rocket Launcher": enemyRocketLauncher};
 
 //Function to draw all background elements defined above, along with some text objects
 function drawBackgroundElements() {
@@ -217,6 +234,12 @@ function drawBackgroundElements() {
 }
 
 //Function to draw troop based on position, rotation, etc
+
+function drawProjectile(Projectile){
+
+}
+
+
 function drawTroop(troop){
     let rot = Math.atan(troop.dy/troop.dx);
     if (troop.side === "Friendly") {
@@ -301,14 +324,18 @@ function slow(){
 }
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (var i = 0; i < friendlies.length; i++) {
-        for (let j = 0; j < enemies.length; j++) {
-            if(distance(friendlies[i].x, friendlies[i].y, enemies[j].x, enemies[j].y) < friendlies[i].range){
-                new Projectile();
-            }
-        }
-    }
+    friendlies.forEach(function(friendly) {
+        enemies.forEach(function(enemy){
+           if (distance(friendly.x, friendly.y,enemy.x, enemy.y) < friendly.range) {
+               let imagewidth = friendlyTroopsList[friendly.type].width;
+               let distx = enemy.x - friendly.x;
+               let disty = enemy.y - friendly.y;
+               friendly.targetX = friendly.x;
+               friendly.targetY = friendly.y;
+               projectiles.push(new Projectile(friendly.x))
+           }
+        });
+    });
 
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
@@ -341,8 +368,6 @@ setInterval(slow, 1000);
 setInterval(draw, 10);
 
 
-let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Launcher": raft4};
-let enemyTroopsList = {"Soldier": enemySoldier, "Sniper": enemySniper, "Gunner": enemyGunner, "Rocket Launcher": enemyRocketLauncher};
 setTimeout(function() {
     rafts = [];
     let raftTroops = [];
