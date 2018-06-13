@@ -2,6 +2,7 @@
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 
+
 //Resize canvas to perfectly fit given space
 const pageHeight = window.innerHeight;
 const pageWidth = window.innerWidth;
@@ -20,11 +21,11 @@ let rafts = [];
 
 
 //Define variables that will help with troop selection and deployment
-let money = 100;
+let money = 1000000;
 let currentTroop = 1;
 const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
 const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
-const fireIntervals = {"Soldier": .4, "Sniper": 5, "Gunner": .1, "Rocket Launcher": 2};
+const fireIntervals = {"Soldier": 400, "Sniper": 5000, "Gunner": 100, "Rocket Launcher": 2000};
 const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 400, "Rocket Launcher" : 150};
 const damages = {"Soldier": 25, "Sniper": 250, "Gunner": 10, "Rocket Launcher" : 100};
 const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 250, "Rocket Launcher" : 600};
@@ -34,6 +35,8 @@ let lastDeployed = Date.now();
 
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
+
+const rounds = [];
 /*
 Round 1:
 30 Soldiers
@@ -96,10 +99,12 @@ function Raft(img, x, y) {
     this.y = y;
 }
 
-function Projectile(side, type, dx, dy, speed, aoe, damage) {
+function Projectile(side, type, x, y, dx, dy, aoe, damage) {
     this.side = side;
     this.type = type;
     this.state = "active";
+    this.x = x;
+    this.y = y;
     this.dx = dx;
     this.dy = dy;
     this.aoe = aoe;
@@ -208,6 +213,7 @@ let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Lau
 let friendlyTroopsList = {"Soldier": friendlySoldier, "Sniper": friendlySniper, "Gunner": friendlyGunner, "Rocket Launcher": friendlyRocketLauncher};
 let enemyTroopsList = {"Soldier": enemySoldier, "Sniper": enemySniper, "Gunner": enemyGunner, "Rocket Launcher": enemyRocketLauncher};
 
+
 //Function to draw all background elements defined above, along with some text objects
 function drawBackgroundElements() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
@@ -235,41 +241,58 @@ function drawBackgroundElements() {
 
 //Function to draw troop based on position, rotation, etc
 
-function drawProjectile(Projectile){
-    let rot = Math.atan(Projectile.dx/Projectile.dy);
-    if(Projectile.side === "Friendly"){
-        if(Projectile.type === "Bullet"){
-            img = bullet;
-            ctx.translate(resizeWidth(Projectile.x), resizeHeight(Projectile.y));
+function drawProjectile(proj){
+    let rot = Math.atan2(proj.dy,proj.dx);
+    if(proj.side === "Friendly"){
+        if(proj.type === "Bullet"){
+            let img = bullet;
+            ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
             ctx.rotate(rot);
-            ctx.drawImage(img, resizeWidth(), resizeHeight(), resizeWidth(img.width), resizeHeight(img.height));
+            ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            projectiles.forEach(function(P) {
-                enemies.forEach(function(enemy){
-                    if (distance(P.x, P.y,enemy.x, enemy.y) < P.aoe) {
-                        enemy.health -= P.damage;
+            for (let i = 0; i < enemies.length; i++) {
+                let enemy = enemies[i];
+                console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
+                if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
+                    enemy.health -= proj.damage;
+                    if (enemy.health <= 0) {
+                        enemies.splice(i, 1);
                     }
-                });
-            });
+                    for (let i = 0; i < projectiles.length; i++) {
+                        if (projectiles[i] === proj) {
+                            projectiles.splice(i,1);
+                        }
+                    }
+                }
+            }
+
         }
-        else if(Projectile.type === "Rocket"){
-            img = rocket;
-            ctx.translate(resizeWidth(P.x), resizeHeight(Projectile.y));
+        else if(proj.type === "Rocket"){
+            let img = rocket;
+            ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
             ctx.rotate(rot);
-            ctx.drawImage(img, resizeWidth(), resizeHeight(), resizeWidth(img.width), resizeHeight(img.height));
+            ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
             ctx.setTransform(1, 0, 0, 1, 0, 0);
-            projectiles.forEach(function(P) {
-                enemies.forEach(function(enemy){
-                    if (distance(P.x, P.y,enemy.x, enemy.y) < P.aoe) {
-                        enemy.health -= P.damage;
+            for (let i = 0; i < enemies.length; i++) {
+                let enemy = enemies[i];
+                console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
+                if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
+                    enemy.health -= proj.damage;
+                    if (enemy.health <= 0) {
+                        enemies.splice(i, 1);
                     }
-                });
-            });
+                    for (let i = 0; i < projectiles.length; i++) {
+                        if (projectiles[i] === proj) {
+                            projectiles.splice(i,1);
+                        }
+                    }
+                }
+            }
         }
 
     }
-    if(troop.side === "Enemy"){
-        let img = Projectile
+    if(proj.side === "Enemy"){
+        let img = proj;
     }
 
 }
@@ -332,14 +355,12 @@ document.body.onkeypress = function (key) {
 
 //Handler for clicking to deploy troops
 function onClickHandler(e) {
-    console.log(Date.now(), lastDeployed, Date.now() - lastDeployed);
     if (money >= costs[currentTroop] && Date.now() - lastDeployed > 2000) {
         lastDeployed = Date.now();
         let targetX = e.pageX*1920/canvas.width;
         let targetY = e.pageY*1080/canvas.height;
 
         if (targetX > 480 && targetX < 1440 && targetY < 880) {
-            console.log(targetX,targetY);
             let dx = .2;
             if (targetY > 540) {
                 let dy = -.2 * (766-targetY)/(targetX-512);
@@ -361,17 +382,37 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     friendlies.forEach(function(friendly) {
         enemies.forEach(function(enemy){
-           if (distance(friendly.x, friendly.y,enemy.x, enemy.y) < friendly.range) {
-               let imagewidth = friendlyTroopsList[friendly.type].width;
-               let distx = enemy.x - friendly.x;
-               let disty = enemy.y - friendly.y;
+           if (distance(friendly.x, friendly.y,enemy.x, enemy.y) < friendly.range && Date.now() - friendly.lastShot > friendly.fireInterval) {
+               friendly.lastShot = Date.now();
+               let w = friendlyTroopsList[friendly.type].width;
+               let h = friendlyTroopsList[friendly.type].width;
+               friendly.dx = enemy.x - friendly.x;
+               friendly.dy = enemy.y - friendly.y;
+               let angle = Math.atan2(friendly.dy, friendly.dx);
                friendly.targetX = friendly.x;
                friendly.targetY = friendly.y;
-               projectiles.push(new Projectile(friendly.x))
+               let type = "Bullet";
+               let aoe = 40;
+               let fac = 2.5;
+               if (friendly.type === "Rocket Launcher") {
+                   type = "Rocket";
+                   aoe = 100;
+                   let fac = 1;
+               }
+               let p = new Projectile("Friendly", type, friendly.x + w*Math.cos(angle), friendly.y + h*Math.sin(angle), fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
+               //console.log(p.x,p.y);
+               projectiles.push(p);
            }
         });
     });
 
+
+    projectiles.forEach(function(p) {
+        //console.log(p.x, p.y);
+       drawProjectile(p);
+       p.x += p.dx;
+       p.y += p.dy;
+    });
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
         friendlies.forEach(function(item) {
