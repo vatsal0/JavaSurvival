@@ -19,15 +19,15 @@ let money = 1000000;
 let currentTroop = 1;
 const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
 const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
-const fireIntervals = {"Soldier": 400, "Sniper": 3000, "Gunner": 100, "Rocket Launcher": 2000};
-const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 900, "Rocket Launcher" : 150};
-const damages = {"Soldier": 25, "Sniper": 75, "Gunner": 10, "Rocket Launcher" : 100};
-const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 2500, "Rocket Launcher" : 600};
+const fireIntervals = {"Soldier": 400, "Sniper": 5000, "Gunner": 100, "Rocket Launcher": 2000};
+const healths = {"Soldier": 100, "Sniper": 40, "Gunner": 400, "Rocket Launcher" : 150};
+const damages = {"Soldier": 25, "Sniper": 250, "Gunner": 10, "Rocket Launcher" : 100};
+const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 250, "Rocket Launcher" : 600};
 
 let lastDeployed = Date.now();
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
-const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]];
+const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3]];
 
 const rounds = [];
 
@@ -83,22 +83,20 @@ function Troop(side, type, x, y, dx, dy, targetX, targetY) {
     this.health = this.maxHealth;
     this.damage = damages[type];
     this.range = ranges[type];
-    this.centerX = x;
-    this.centerY = y;
-    this.move = function () {
-        this.x += this.dx;
-        this.y += this.dy;
-        this.centerX = this.x;
-        this.centerY = this.y;
-        let rotation = Math.atan(this.dy/this.dx);
+    this.getCenter = function(rotation) {
+        let centerX = this.x;
+        let centerY = this.y;
         if (this.side === "Friendly") {
-            this.centerX += 35.3553391 * Math.cos(rotation + Math.PI/4);
-            this.centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            centerX += 35.3553391 * Math.cos(rotation + Math.PI/4);
+            centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            return [centerX, centerY];
         } else {
-            rotation *= -1;
-            this.centerX += enemyTroopsList[this.type].width;
-            this.centerX -= 35.3553391 * Math.cos(rotation + Math.PI/4);
-            this.centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            centerX += enemyTroopsList[this.type].width;
+            console.log(centerX, centerY);
+            centerX -= 35.3553391 * Math.cos(rotation + Math.PI/4);
+            centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            console.log(centerX, centerY);
+            return [centerX, centerY];
         }
     }
 }
@@ -240,6 +238,7 @@ function drawBackgroundElements() {
 
 function drawProjectile(proj){
     let rot = Math.atan2(proj.dy,proj.dx);
+    console.log(proj.side);
     if(proj.side === "Friendly"){
         let img = bullet;
         if (proj.type === "Rocket") {
@@ -251,8 +250,8 @@ function drawProjectile(proj){
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         for (let i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
-            if (distance(proj.x, proj.y,enemy.centerX, enemy.centerY) < 25) {
-                console.log(enemy.type);
+            //console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
+            if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
                 enemy.health -= proj.damage;
                 if (enemy.health <= 0) {
                     enemies.splice(i, 1);
@@ -276,7 +275,8 @@ function drawProjectile(proj){
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         for (let i = 0; i < friendlies.length; i++) {
             let friendly = friendlies[i];
-            if (distance(proj.x, proj.y,friendly.centerX, friendly.centerY) < 25) {
+            //console.log(distance(proj.x, proj.y,friendly.x, friendly.y), proj.aoe);
+            if (distance(proj.x, proj.y,friendly.x, friendly.y) < proj.aoe) {
                 friendly.health -= proj.damage;
                 if (friendly.health <= 0) {
                     friendlies.splice(i, 1);
@@ -314,6 +314,7 @@ function drawTroop(troop){
         ctx.fillStyle = "rgb(" + r + "," + g + ",0)";
         ctx.drawImage(barOutline, resizeWidth(troop.x - 5), resizeHeight(troop.y - 20), resizeWidth(barOutline.width), resizeHeight(barOutline.height));
         ctx.fillRect(resizeWidth(troop.x - 4), resizeHeight(troop.y - 21), resizeWidth(bar.width)*healthRatio, resizeHeight(bar.height));
+        let a = troop.getCenter(rot);
         ctx.fillStyle = currentStyle;
     }
     if (troop.side === "Enemy") {
@@ -338,7 +339,6 @@ function drawTroop(troop){
         ctx.fillRect(resizeWidth(troop.x + img.width - 54), resizeHeight(troop.y - 21), resizeWidth(bar.width)*healthRatio, resizeHeight(bar.height));
         ctx.fillStyle = currentStyle;
     }
-    //ctx.fillRect(resizeWidth(troop.centerX),resizeHeight(troop.centerY),50,50);
 }
 
 //Event handler for selecting different troops (1-4)
@@ -375,93 +375,87 @@ function slow(){
 }
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     friendlies.forEach(function(friendly) {
-        let target;
-        let closestDist = 10000;
         enemies.forEach(function(enemy){
-            let d = distance(friendly.x, friendly.y,enemy.x, enemy.y);
-            if (d < friendly.range && d < closestDist && Date.now() - friendly.lastShot > friendly.fireInterval) {
-                closestDist =  d;
-                target = enemy;
-            }
+           if (distance(friendly.x, friendly.y,enemy.x, enemy.y) < friendly.range && Date.now() - friendly.lastShot > friendly.fireInterval) {
+               friendly.lastShot = Date.now();
+               let w = friendlyTroopsList[friendly.type].width;
+               let h = friendlyTroopsList[friendly.type].width;
+               friendly.dx = enemy.x - friendly.x;
+               friendly.dy = enemy.y - friendly.y;
+               let angle = Math.atan2(friendly.dy, friendly.dx);
+               friendly.targetX = friendly.x;
+               friendly.targetY = friendly.y;
+               let type = "Bullet";
+               let aoe = 40;
+               let fac = 5;
+               if (friendly.type === "Rocket Launcher") {
+                   type = "Rocket";
+                   aoe = 100;
+                   fac = 1;
+               }
+               let p = new Projectile("Friendly", type, friendly.x + w*Math.cos(angle), friendly.y - h + h*Math.sin(angle), fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
+               //console.log(p.x,p.y); l
+               projectiles.push(p);
+           }
         });
-        if (target) {
-            friendly.lastShot = Date.now();
-            let w = friendlyTroopsList[friendly.type].width;
-            let h = friendlyTroopsList[friendly.type].width;
-            friendly.dx = target.centerX - friendly.centerX;
-            friendly.dy = target.centerY - friendly.centerY;
-            let angle = Math.atan2(friendly.dy, friendly.dx);
-            friendly.targetX = friendly.x;
-            friendly.targetY = friendly.y;
-            let type = "Bullet";
-            let aoe = 40;
-            let fac = 5;
-            if (friendly.type === "Rocket Launcher") {
-                type = "Rocket";
-                aoe = 100;
-                fac = 1;
-            }
-            let p = new Projectile("Friendly", type, friendly.centerX, friendly.centerY, fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
-            projectiles.push(p);
-        }
     });
 
     enemies.forEach(function(enemy) {
-        let target;
-        let closestDist = 10000;
         friendlies.forEach(function(friendly){
-            let d = distance(enemy.x, enemy.y,friendly.x, friendly.y);
-            if (d < enemy.range && d < closestDist && Date.now() - enemy.lastShot > enemy.fireInterval) {
-                closestDist =  d;
-                target = friendly;
+            if (Date.now() - enemy.lastShot > enemy.fireInterval) {
+                if (distance(enemy.x, enemy.y,friendly.x, friendly.y) < enemy.range) {
+                    enemy.lastShot = Date.now();
+                    let w = enemyTroopsList[enemy.type].width;
+                    let h = enemyTroopsList[enemy.type].width;
+                    enemy.dx = enemy.x - friendly.x;
+                    enemy.dy = friendly.y - enemy.y;
+                    let angle = Math.atan2(enemy.dy, enemy.dx);
+                    enemy.targetX = enemy.x;
+                    enemy.targetY = enemy.y;
+                    let type = "Bullet";
+                    let aoe = 40;
+                    let fac = -10;
+                    if (enemy.type === "Rocket Launcher") {
+                        type = "Rocket";
+                        aoe = 100;
+                        fac = -1;
+                    }
+                    let p = new Projectile("Enemy", type, enemy.x + w*Math.cos(angle), enemy.y + h*Math.sin(angle), fac,-fac*enemy.dy/enemy.dx, aoe, damages[enemy.type]);
+                    //console.log(p.x,p.y); l
+                    projectiles.push(p);
+                } else {
+                    enemy.dx = -.2;
+                    enemy.dy = 0;
+                    enemy.targetY = enemy.y;
+                    enemy.targetX = 480;
+                }
             }
+
         });
-        if (target) {
-            enemy.lastShot = Date.now();
-            let w = enemyTroopsList[enemy.type].width;
-            let h = enemyTroopsList[enemy.type].width;
-            enemy.dx = target.centerX - enemy.centerX;
-            enemy.dy = target.centerY - enemy.centerY;
-            let angle = Math.atan2(enemy.dy, enemy.dx);
-            enemy.targetX = enemy.x;
-            enemy.targetY = enemy.y;
-            let type = "Bullet";
-            let aoe = 40;
-            let fac = -5;
-            if (enemy.type === "Rocket Launcher") {
-                type = "Rocket";
-                aoe = 100;
-                fac = -1;
-            }
-            let p = new Projectile("Enemy", type, enemy.centerX, enemy.centerY, fac,fac*enemy.dy/enemy.dx, aoe, damages[enemy.type]);
-            projectiles.push(p);
-        }
     });
 
-    for (let i = 0; i < projectiles.length; i++) {
-        let p = projectiles[i];
-        drawProjectile(p);
-        p.x += p.dx;
-        p.y += p.dy;
-        if (p.x < 0 || p.x > 1920) {
-            projectiles.splice(i,1);
-        }
-    }
+    projectiles.forEach(function(p) {
+        //console.log(p.x, p.y);
+       drawProjectile(p);
+       p.x += p.dx;
+       p.y += p.dy;
+    });
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
         friendlies.forEach(function(item) {
             drawTroop(item);
             if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
-                item.move();
+                item.x += item.dx;
+                item.y += item.dy;
             }
 
         });
-        enemies.forEach(function(item) {
+       enemies.forEach(function(item) {
             drawTroop(item);
             if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
-                item.move();
+                item.x += item.dx;
+                item.y -= item.dy;
             }
 
         });
@@ -503,3 +497,37 @@ setTimeout(function() {
     }
     //side, type, x, y, dx, dy, targetX, targetY;
 }, 1000);
+
+
+friendlies.forEach(function(friendly) {
+        let target;
+        let closestDist = 10000;
+        enemies.forEach(function(enemy){
+            let d = distance(friendly.x, friendly.y,enemy.x, enemy.y);
+           if (d < friendly.range && Date.now() - friendly.lastShot > friendly.fireInterval) {
+               closestDist =  d;
+               target = enemy;
+           }
+        });
+        if (target) {
+            console.log(enemy.type);
+                           friendly.lastShot = Date.now();
+                           let w = friendlyTroopsList[friendly.type].width;
+                           let h = friendlyTroopsList[friendly.type].width;
+                           friendly.dx = enemy.centerX - friendly.centerX;
+                           friendly.dy = enemy.centerY - friendly.centerY;
+                           let angle = Math.atan2(friendly.dy, friendly.dx);
+                           friendly.targetX = friendly.x;
+                           friendly.targetY = friendly.y;
+                           let type = "Bullet";
+                           let aoe = 40;
+                           let fac = 5;
+                           if (friendly.type === "Rocket Launcher") {
+                               type = "Rocket";
+                               aoe = 100;
+                               fac = 1;
+                           }
+                           let p = new Projectile("Friendly", type, friendly.centerX, friendly.centerY, fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
+                           projectiles.push(p);
+        }
+    });
