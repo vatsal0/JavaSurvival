@@ -125,21 +125,21 @@ function Projectile(side, type, x, y, dx, dy, aoe, damage) {
 
 }
 //Define background components and images
-let water = createImage("../Assets/Water.png",function() {
+let water = createImage("Assets/Water.png",function() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
     imagesLoaded++;
 });
-let base = createImage("../Assets/Homebase.png", function() {
+let base = createImage("Assets/Homebase.png", function() {
     ctx.drawImage(base,0,canvas.height/10,resizeWidth(base.width),resizeHeight(base.height));
     imagesLoaded++;
 });
-let troopButtons = createImage("../Assets/TroopButton.png", function(){
+let troopButtons = createImage("Assets/TroopButton.png", function(){
     for (let i = 0; i < 800; i+= 200) {
         ctx.drawImage(troopButtons, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
         ctx.font = "60px Segoe UI";
         let buttonNumber = (i/200 + 1);
         if (buttonNumber === currentTroop) {
-            glow = createImage("../Assets/SelectGlow.png", function() {
+            glow = createImage("Assets/SelectGlow.png", function() {
                ctx.drawImage(glow, resizeWidth(550 + i), canvas.height-resizeHeight(50), resizeWidth(glow.width), resizeHeight(glow.height));
             });
         }
@@ -147,69 +147,69 @@ let troopButtons = createImage("../Assets/TroopButton.png", function(){
     }
     imagesLoaded++;
 });
-let iconSoldier = createImage("../Assets/Icons/Soldier.png", function() {
+let iconSoldier = createImage("Assets/Icons/Soldier.png", function() {
     ctx.drawImage(iconSoldier,resizeWidth(570.42),resizeHeight(979.76),resizeWidth(iconSoldier.width),resizeHeight(iconSoldier.height));
     imagesLoaded++;
 });
-const iconSniper = createImage("../Assets/Icons/Sniper.png", function() {
+const iconSniper = createImage("Assets/Icons/Sniper.png", function() {
     ctx.drawImage(iconSniper,resizeWidth(770.22),resizeHeight(992.2),resizeWidth(iconSniper.width),resizeHeight(iconSniper.height));
     imagesLoaded++;
 });
-let iconGunner = createImage("../Assets/Icons/Gunner.png", function() {
+let iconGunner = createImage("Assets/Icons/Gunner.png", function() {
     ctx.drawImage(iconGunner,resizeWidth(969.8),resizeHeight(982.78),resizeWidth(iconGunner.width),resizeHeight(iconGunner.height));
     imagesLoaded++;
 });
-let iconRocketLauncher = createImage("../Assets/Icons/Rocket Launcher.png", function() {
+let iconRocketLauncher = createImage("Assets/Icons/Rocket Launcher.png", function() {
     ctx.drawImage(iconRocketLauncher,resizeWidth(1169.53),resizeHeight(989.33),resizeWidth(iconRocketLauncher.width),resizeHeight(iconRocketLauncher.height));
     imagesLoaded++;
 });
 //Define images for friendly and enemy troops
-let friendlySoldier = createImage("../Assets/Friendlies/Soldier.png", function () {
+let friendlySoldier = createImage("Assets/Friendlies/Soldier.png", function () {
     imagesLoaded++;
 });
-let friendlySniper = createImage("../Assets/Friendlies/Sniper.png", function () {
+let friendlySniper = createImage("Assets/Friendlies/Sniper.png", function () {
     imagesLoaded++;
 });
-let friendlyGunner = createImage("../Assets/Friendlies/Gunner.png", function () {
+let friendlyGunner = createImage("Assets/Friendlies/Gunner.png", function () {
     imagesLoaded++;
 });
-let friendlyRocketLauncher = createImage("../Assets/Friendlies/Rocket Launcher.png", function () {
+let friendlyRocketLauncher = createImage("Assets/Friendlies/Rocket Launcher.png", function () {
     imagesLoaded++;
 });
-let enemySoldier = createImage("../Assets/Enemies/Soldier.png", function () {
+let enemySoldier = createImage("Assets/Enemies/Soldier.png", function () {
     imagesLoaded++;
 });
-let enemySniper = createImage("../Assets/Enemies/Sniper.png", function () {
+let enemySniper = createImage("Assets/Enemies/Sniper.png", function () {
     imagesLoaded++;
 });
-let enemyGunner = createImage("../Assets/Enemies/Gunner.png", function () {
+let enemyGunner = createImage("Assets/Enemies/Gunner.png", function () {
     imagesLoaded++;
 });
-let enemyRocketLauncher = createImage("../Assets/Enemies/Rocket Launcher.png", function () {
+let enemyRocketLauncher = createImage("Assets/Enemies/Rocket Launcher.png", function () {
     imagesLoaded++;
 });
-let barOutline = createImage("../Assets/Health/BarOutline.png", function () {
+let barOutline = createImage("Assets/Health/BarOutline.png", function () {
     imagesLoaded++;
 });
-let bar = createImage("../Assets/Health/Bar.png", function () {
+let bar = createImage("Assets/Health/Bar.png", function () {
     imagesLoaded++;
 });
-let raft1 = createImage("../Assets/Rafts/Raft1.png", function () {
+let raft1 = createImage("Assets/Rafts/Raft1.png", function () {
     imagesLoaded++;
 });
-let raft2 = createImage("../Assets/Rafts/Raft2.png", function () {
+let raft2 = createImage("Assets/Rafts/Raft2.png", function () {
     imagesLoaded++;
 });
-let raft3 = createImage("../Assets/Rafts/Raft3.png", function () {
+let raft3 = createImage("Assets/Rafts/Raft3.png", function () {
     imagesLoaded++;
 });
-let raft4 = createImage("../Assets/Rafts/Raft4.png", function () {
+let raft4 = createImage("Assets/Rafts/Raft4.png", function () {
     imagesLoaded++;
 });
-let bullet = createImage("../Assets/Bullet.png", function(){
+let bullet = createImage("Assets/Bullet.png", function(){
     imagesLoaded++;
 });
-let rocket = createImage("../Assets/Rocket.png", function(){
+let rocket = createImage("Assets/Rocket.png", function(){
     imagesLoaded++;
 });
 
