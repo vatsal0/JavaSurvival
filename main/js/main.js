@@ -29,7 +29,12 @@ let lastDeployed = Date.now();
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]];
 
-const rounds = [];
+const rounds = [
+    [["Sniper",4]],
+    [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]],
+    [["Gunner", 2],["Gunner",2], ["Gunner",2], ["Sniper", 5], ["Sniper",5]]
+];
+let roundNumber = 1;
 
 
 /*
@@ -226,12 +231,19 @@ function drawBackgroundElements() {
         ctx.fillText("" + buttonNumber, resizeWidth(634 + i), resizeHeight(920), resizeWidth(32));
         ctx.fillText("$" +  costs[buttonNumber], resizeWidth(634 + i), resizeHeight(960), resizeWidth(32));
     }
+    ctx.font = "60px Segoe UI";
+    if (roundNumber > 0) {
+        ctx.fillText("Round " + roundNumber, 0, 50,200);
+    } else {
+        ctx.fillText("You win!", 0, 50,200);
+    }
+
     ctx.drawImage(iconSoldier,resizeWidth(570.42),resizeHeight(979.76),resizeWidth(iconSoldier.width),resizeHeight(iconSoldier.height));
     ctx.drawImage(iconSniper,resizeWidth(770.22),resizeHeight(992.2),resizeWidth(iconSniper.width),resizeHeight(iconSniper.height));
     ctx.drawImage(iconGunner,resizeWidth(969.8),resizeHeight(982.78),resizeWidth(iconGunner.width),resizeHeight(iconGunner.height));
     ctx.drawImage(iconRocketLauncher,resizeWidth(1169.53),resizeHeight(989.33),resizeWidth(iconRocketLauncher.width),resizeHeight(iconRocketLauncher.height));
     ctx.fillStyle = "#39BC6D";
-    ctx.font = "60px Segoe UI";
+
     ctx.fillText("$" + money, 0, resizeHeight(1050), resizeWidth(300));
 
 }
@@ -252,7 +264,6 @@ function drawProjectile(proj){
         for (let i = 0; i < enemies.length; i++) {
             let enemy = enemies[i];
             if (distance(proj.x, proj.y,enemy.centerX, enemy.centerY) < 25) {
-                console.log(enemy.type);
                 enemy.health -= proj.damage;
                 if (enemy.health <= 0) {
                     enemies.splice(i, 1);
@@ -423,8 +434,8 @@ function draw() {
             let w = enemyTroopsList[enemy.type].width;
             let h = enemyTroopsList[enemy.type].width;
             enemy.dx = target.centerX - enemy.centerX;
-            enemy.dy = target.centerY - enemy.centerY;
-            let angle = Math.atan2(enemy.dy, enemy.dx);
+            enemy.dy = enemy.centerY - target.centerY;
+            let angle = Math.atan(enemy.dy/enemy.dx);
             enemy.targetX = enemy.x;
             enemy.targetY = enemy.y;
             let type = "Bullet";
@@ -435,7 +446,7 @@ function draw() {
                 aoe = 100;
                 fac = -1;
             }
-            let p = new Projectile("Enemy", type, enemy.centerX, enemy.centerY, fac,fac*enemy.dy/enemy.dx, aoe, damages[enemy.type]);
+            let p = new Projectile("Enemy", type, enemy.centerX, enemy.centerY, fac,-fac*enemy.dy/enemy.dx, aoe, damages[enemy.type]);
             projectiles.push(p);
         }
     });
@@ -477,13 +488,15 @@ function draw() {
 setInterval(slow, 1000);
 setInterval(draw, 10);
 
+function roundFunc(i) {
 
-setTimeout(function() {
+    let round = rounds[i];
+    let allTroopsDeployed = false;
     rafts = [];
     let raftTroops = [];
     //[[Soldier,30], [Sniper,10]]
-    for (let i=0; i < round1.length; i++) {
-        raftTroops.push([round1[i][0], round1[i][1]]);
+    for (let i=0; i < round.length; i++) {
+        raftTroops.push([round[i][0], round[i][1]]);
     }
     for (let x=1; x<= raftTroops.length; x++) {
         let soldierType = raftTroops[x-1][0];
@@ -495,11 +508,27 @@ setTimeout(function() {
             troopsDeployed++;
             if (troopsDeployed === troopCount) {
                 clearInterval(deployEnemy);
+                allTroopsDeployed = true;
             }
             let enemyImg = enemyTroopsList[soldierType];
             enemies.push(new Troop("Enemy", soldierType, 1720 - enemyImg.width, raftPos-25,-.2,0,480,raftPos-25));
-        },5000);
+        },500);
         rafts.push(new Raft(img, 1720, raftPos-40));
     }
+    let checkForNext = setInterval(function() {
+        if (allTroopsDeployed && enemies.length === 0) {
+            if (i+1 < rounds.length) {
+                roundNumber++;
+                roundFunc(i+1);
+                clearInterval(checkForNext);
+            } else {
+                roundNumber = 0;
+                rafts = [];
+            }
+        }
+    }, 1000)
     //side, type, x, y, dx, dy, targetX, targetY;
+}
+setTimeout(function() {
+    roundFunc(0);
 }, 1000);
