@@ -1,25 +1,19 @@
 //Get canvas from html
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
-
-
 //Resize canvas to perfectly fit given space
 const pageHeight = window.innerHeight;
 const pageWidth = window.innerWidth;
 canvas.height = pageHeight;
 canvas.width = pageWidth;
-
 //Define variables for image loading
 const imagesCount = 21;
 let imagesLoaded = 0;
-
 //Define tables for troops
 const friendlies = [];
 const enemies = [];
 const projectiles = [];
 let rafts = [];
-
-
 //Define variables that will help with troop selection and deployment
 let money = 1000000;
 let currentTroop = 1;
@@ -33,10 +27,11 @@ const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 250, "Rocket Launcher"
 let lastDeployed = Date.now();
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
-
-const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
+const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3]];
 
 const rounds = [];
+
+
 /*
 Round 1:
 30 Soldiers
@@ -61,11 +56,9 @@ function resizeWidth(x) {
 function resizeHeight(y) {
     return y/1080 * canvas.height;
 }
-
 function distance(x1, y1, x2, y2) {
     return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
 }
-
 //Defining object constructors
 function createImage(src,func) {
     let img = new Image();
@@ -75,7 +68,6 @@ function createImage(src,func) {
     }
     return img;
 }
-
 function Troop(side, type, x, y, dx, dy, targetX, targetY) {
     this.side = side;
     this.type = type;
@@ -91,14 +83,28 @@ function Troop(side, type, x, y, dx, dy, targetX, targetY) {
     this.health = this.maxHealth;
     this.damage = damages[type];
     this.range = ranges[type];
+    this.getCenter = function(rotation) {
+        let centerX = this.x;
+        let centerY = this.y;
+        if (this.side === "Friendly") {
+            centerX += 35.3553391 * Math.cos(rotation + Math.PI/4);
+            centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            return [centerX, centerY];
+        } else {
+            centerX += enemyTroopsList[this.type].width;
+            console.log(centerX, centerY);
+            centerX -= 35.3553391 * Math.cos(rotation + Math.PI/4);
+            centerY += 35.3553391 * Math.sin(rotation + Math.PI/4);
+            console.log(centerX, centerY);
+            return [centerX, centerY];
+        }
+    }
 }
-
 function Raft(img, x, y) {
     this.img = img;
     this.x = x;
     this.y = y;
 }
-
 function Projectile(side, type, x, y, dx, dy, aoe, damage) {
     this.side = side;
     this.type = type;
@@ -111,18 +117,15 @@ function Projectile(side, type, x, y, dx, dy, aoe, damage) {
     this.damage = damage;
 
 }
-
 //Define background components and images
 let water = createImage("../Assets/Water.png",function() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
     imagesLoaded++;
 });
-
 let base = createImage("../Assets/Homebase.png", function() {
     ctx.drawImage(base,0,canvas.height/10,resizeWidth(base.width),resizeHeight(base.height));
     imagesLoaded++;
 });
-
 let troopButtons = createImage("../Assets/TroopButton.png", function(){
     for (let i = 0; i < 800; i+= 200) {
         ctx.drawImage(troopButtons, resizeWidth(550 + i), canvas.height-resizeHeight(200), resizeWidth(200), resizeHeight(200));
@@ -137,27 +140,22 @@ let troopButtons = createImage("../Assets/TroopButton.png", function(){
     }
     imagesLoaded++;
 });
-
 let iconSoldier = createImage("../Assets/Icons/Soldier.png", function() {
     ctx.drawImage(iconSoldier,resizeWidth(570.42),resizeHeight(979.76),resizeWidth(iconSoldier.width),resizeHeight(iconSoldier.height));
     imagesLoaded++;
 });
-
 const iconSniper = createImage("../Assets/Icons/Sniper.png", function() {
     ctx.drawImage(iconSniper,resizeWidth(770.22),resizeHeight(992.2),resizeWidth(iconSniper.width),resizeHeight(iconSniper.height));
     imagesLoaded++;
 });
-
 let iconGunner = createImage("../Assets/Icons/Gunner.png", function() {
     ctx.drawImage(iconGunner,resizeWidth(969.8),resizeHeight(982.78),resizeWidth(iconGunner.width),resizeHeight(iconGunner.height));
     imagesLoaded++;
 });
-
 let iconRocketLauncher = createImage("../Assets/Icons/Rocket Launcher.png", function() {
     ctx.drawImage(iconRocketLauncher,resizeWidth(1169.53),resizeHeight(989.33),resizeWidth(iconRocketLauncher.width),resizeHeight(iconRocketLauncher.height));
     imagesLoaded++;
 });
-
 //Define images for friendly and enemy troops
 let friendlySoldier = createImage("../Assets/Friendlies/Soldier.png", function () {
     imagesLoaded++;
@@ -208,12 +206,9 @@ let rocket = createImage("../Assets/Rocket.png", function(){
     imagesLoaded++;
 });
 
-
 let raftsList = {"Soldier": raft1, "Sniper": raft2, "Gunner": raft3, "Rocket Launcher": raft4};
 let friendlyTroopsList = {"Soldier": friendlySoldier, "Sniper": friendlySniper, "Gunner": friendlyGunner, "Rocket Launcher": friendlyRocketLauncher};
 let enemyTroopsList = {"Soldier": enemySoldier, "Sniper": enemySniper, "Gunner": enemyGunner, "Rocket Launcher": enemyRocketLauncher};
-
-
 //Function to draw all background elements defined above, along with some text objects
 function drawBackgroundElements() {
     ctx.drawImage(water,canvas.width - resizeWidth(water.width),0,resizeWidth(water.width),resizeHeight(water.height));
@@ -243,60 +238,59 @@ function drawBackgroundElements() {
 
 function drawProjectile(proj){
     let rot = Math.atan2(proj.dy,proj.dx);
+    console.log(proj.side);
     if(proj.side === "Friendly"){
-        if(proj.type === "Bullet"){
-            let img = bullet;
-            ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
-            ctx.rotate(rot);
-            ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            for (let i = 0; i < enemies.length; i++) {
-                let enemy = enemies[i];
-                console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
-                if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
-                    enemy.health -= proj.damage;
-                    if (enemy.health <= 0) {
-                        enemies.splice(i, 1);
-                    }
-                    for (let i = 0; i < projectiles.length; i++) {
-                        if (projectiles[i] === proj) {
-                            projectiles.splice(i,1);
-                        }
-                    }
-                }
-            }
-
+        let img = bullet;
+        if (proj.type === "Rocket") {
+            img = rocket;
         }
-        else if(proj.type === "Rocket"){
-            let img = rocket;
-            ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
-            ctx.rotate(rot);
-            ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
-            ctx.setTransform(1, 0, 0, 1, 0, 0);
-            for (let i = 0; i < enemies.length; i++) {
-                let enemy = enemies[i];
-                console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
-                if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
-                    enemy.health -= proj.damage;
-                    if (enemy.health <= 0) {
-                        enemies.splice(i, 1);
-                    }
-                    for (let i = 0; i < projectiles.length; i++) {
-                        if (projectiles[i] === proj) {
-                            projectiles.splice(i,1);
-                        }
+        ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
+        ctx.rotate(rot);
+        ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        for (let i = 0; i < enemies.length; i++) {
+            let enemy = enemies[i];
+            //console.log(distance(proj.x, proj.y,enemy.x, enemy.y), proj.aoe);
+            if (distance(proj.x, proj.y,enemy.x, enemy.y) < proj.aoe) {
+                enemy.health -= proj.damage;
+                if (enemy.health <= 0) {
+                    enemies.splice(i, 1);
+                }
+                for (let i = 0; i < projectiles.length; i++) {
+                    if (projectiles[i] === proj) {
+                        projectiles.splice(i,1);
                     }
                 }
             }
         }
-
     }
     if(proj.side === "Enemy"){
-        let img = proj;
+        let img = bullet;
+        if (proj.type === "Rocket") {
+            img = rocket;
+        }
+        ctx.translate(resizeWidth(proj.x), resizeHeight(proj.y));
+        ctx.rotate(rot);
+        ctx.drawImage(img, 0, 0, img.width, resizeHeight(img.height));
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        for (let i = 0; i < friendlies.length; i++) {
+            let friendly = friendlies[i];
+            //console.log(distance(proj.x, proj.y,friendly.x, friendly.y), proj.aoe);
+            if (distance(proj.x, proj.y,friendly.x, friendly.y) < proj.aoe) {
+                friendly.health -= proj.damage;
+                if (friendly.health <= 0) {
+                    friendlies.splice(i, 1);
+                }
+                for (let i = 0; i < projectiles.length; i++) {
+                    if (projectiles[i] === proj) {
+                        projectiles.splice(i,1);
+                    }
+                }
+            }
+        }
     }
 
 }
-
 
 function drawTroop(troop){
     let rot = Math.atan(troop.dy/troop.dx);
@@ -320,6 +314,7 @@ function drawTroop(troop){
         ctx.fillStyle = "rgb(" + r + "," + g + ",0)";
         ctx.drawImage(barOutline, resizeWidth(troop.x - 5), resizeHeight(troop.y - 20), resizeWidth(barOutline.width), resizeHeight(barOutline.height));
         ctx.fillRect(resizeWidth(troop.x - 4), resizeHeight(troop.y - 21), resizeWidth(bar.width)*healthRatio, resizeHeight(bar.height));
+        let a = troop.getCenter(rot);
         ctx.fillStyle = currentStyle;
     }
     if (troop.side === "Enemy") {
@@ -393,11 +388,11 @@ function draw() {
                friendly.targetY = friendly.y;
                let type = "Bullet";
                let aoe = 40;
-               let fac = 2.5;
+               let fac = 5;
                if (friendly.type === "Rocket Launcher") {
                    type = "Rocket";
                    aoe = 100;
-                   let fac = 1;
+                   fac = 1;
                }
                let p = new Projectile("Friendly", type, friendly.x + w*Math.cos(angle), friendly.y + h*Math.sin(angle), fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
                //console.log(p.x,p.y); l
@@ -406,6 +401,31 @@ function draw() {
         });
     });
 
+    enemies.forEach(function(enemy) {
+        friendlies.forEach(function(friendly){
+            if (distance(enemy.x, enemy.y,friendly.x, friendly.y) < enemy.range && Date.now() - enemy.lastShot > enemy.fireInterval) {
+                enemy.lastShot = Date.now();
+                let w = enemyTroopsList[enemy.type].width;
+                let h = enemyTroopsList[enemy.type].width;
+                enemy.dx = enemy.x - friendly.x;
+                enemy.dy = friendly.y - enemy.y;
+                let angle = Math.atan2(enemy.dy, enemy.dx);
+                enemy.targetX = enemy.x;
+                enemy.targetY = enemy.y;
+                let type = "Bullet";
+                let aoe = 40;
+                let fac = -5;
+                if (enemy.type === "Rocket Launcher") {
+                    type = "Rocket";
+                    aoe = 100;
+                    fac = -1;
+                }
+                let p = new Projectile("Enemy", type, enemy.x + w*Math.cos(angle), enemy.y + h*Math.sin(angle), fac,-fac*enemy.dy/enemy.dx, aoe, damages[enemy.type]);
+                //console.log(p.x,p.y); l
+                projectiles.push(p);
+            }
+        });
+    });
 
     projectiles.forEach(function(p) {
         //console.log(p.x, p.y);
