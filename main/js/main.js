@@ -400,7 +400,7 @@ function draw() {
                    let fac = 1;
                }
                let p = new Projectile("Friendly", type, friendly.x + w*Math.cos(angle), friendly.y + h*Math.sin(angle), fac,fac*friendly.dy/friendly.dx, aoe, damages[friendly.type]);
-               //console.log(p.x,p.y);
+               //console.log(p.x,p.y); l
                projectiles.push(p);
            }
         });
