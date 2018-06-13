@@ -36,7 +36,7 @@ let lastDeployed = Date.now();
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
 
-const rounds = [];
+const rounds = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]];
 /*
 Round 1:
 30 Soldiers
@@ -442,14 +442,12 @@ function draw() {
 }
 setInterval(slow, 1000);
 setInterval(draw, 10);
-
-
-setTimeout(function() {
+function startRound(i) {
     rafts = [];
     let raftTroops = [];
     //[[Soldier,30], [Sniper,10]]
-    for (let i=0; i < round1.length; i++) {
-        raftTroops.push([round1[i][0], round1[i][1]]);
+    for (let i=0; i < rounds.length; i++) {
+        raftTroops.push([rounds[i][0], rounds[i][1]]);
     }
     for (let x=1; x<= raftTroops.length; x++) {
         let soldierType = raftTroops[x-1][0];
@@ -468,4 +466,17 @@ setTimeout(function() {
         rafts.push(new Raft(img, 1720, raftPos-40));
     }
     //side, type, x, y, dx, dy, targetX, targetY;
-}, 1000);
+    x = setInterval(function () {
+        if (enemies.length === 0){
+            i++;
+            if (i < rounds.length){
+                startRound(i);
+            }
+            clearInterval(x);
+
+        }
+        }, 100);
+
+}
+
+setTimeout(100, 1000);
