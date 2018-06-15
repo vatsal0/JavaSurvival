@@ -27,12 +27,13 @@ const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 2500, "Rocket Launcher
 let lastDeployed = Date.now();
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
-const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]];
+
 
 const rounds = [
-    [["Sniper",4]],
-    [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]],
-    [["Gunner", 2],["Gunner",2], ["Gunner",2], ["Sniper", 5], ["Sniper",5]]
+    [["Soldier", 3],["Soldier", 3], ["Soldier", 3], ["Soldier", 3]],
+    [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5]],
+    [["Soldier", 5], ["Sniper", 2],["Soldier", 5], ["Sniper", 2]],
+    [["Soldier", 5], ["Sniper", 3], ["Gunner", 3], ["Sniper", 3], ["Soldier", 5]]
 ];
 let roundNumber = 1;
 

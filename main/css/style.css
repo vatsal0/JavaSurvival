@@ -5,6 +5,11 @@
     overflow: hidden;
 }
 
+body {
+    height: 100vh;
+    background: linear-gradient(#333, white) no-repeat;
+}
+
 
 html, body {
     display: block;
