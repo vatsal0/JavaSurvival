@@ -27,6 +27,8 @@ const ranges = {"Soldier": 400, "Sniper": 1200, "Gunner": 2500, "Rocket Launcher
 const spreads = {"Soldier": 4, "Sniper": 0, "Gunner": 10, "Rocket Launcher" : 2};
 
 let lastDeployed = Date.now();
+let baseMaxHealth = 10000;
+let baseHealth = baseMaxHealth;
 //soldiers cost 50; snipers cost 150; mini gunners cost 400; rocket launchers cost 1000
 
 const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]];
@@ -272,11 +274,16 @@ function drawBackgroundElements() {
         ctx.fillText("$" +  costs[buttonNumber], resizeWidth(634 + i), resizeHeight(960), resizeWidth(32));
     }
     ctx.font = "60px Segoe UI";
-    if (roundNumber > 0) {
+    if (baseHealth <= 0) {
+        baseHealth = 0;
+        ctx.fillText("You lose!", 0, 50, 200);
+    } else if (roundNumber > 0) {
         ctx.fillText("Round " + roundNumber, 0, 50,200);
     } else {
         ctx.fillText("You win!", 0, 50,200);
     }
+    ctx.font = "30px Tw Cen MT";
+    ctx.fillText("HP: " + baseHealth + "/" + baseMaxHealth, resizeWidth(128), resizeHeight(555), resizeWidth(223));
 
     ctx.drawImage(iconSoldier,resizeWidth(570.42),resizeHeight(979.76),resizeWidth(iconSoldier.width),resizeHeight(iconSoldier.height));
     ctx.drawImage(iconSniper,resizeWidth(770.22),resizeHeight(992.2),resizeWidth(iconSniper.width),resizeHeight(iconSniper.height));
@@ -537,6 +544,9 @@ function draw() {
     }
     if (imagesLoaded >= imagesCount) {
         drawBackgroundElements();
+        if (baseHealth <= 0) {
+            return;
+        }
         friendlies.forEach(function(item) {
             drawTroop(item);
             if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
@@ -544,6 +554,13 @@ function draw() {
             }
 
         });
+        for (let i = 0; i < enemies.length; i++) {
+            let enemy = enemies[i];
+            if (enemy.x < 500) {
+                enemies.splice(i,1);
+                baseHealth -= ((10000/enemy.fireInterval) * enemy.damage);
+            }
+        }
         enemies.forEach(function(item) {
             drawTroop(item);
             if (distance(item.x, item.y, item.targetX, item.targetY) > 2) {
