@@ -16,7 +16,7 @@ const projectiles = [];
 const impacts = [];
 let rafts = [];
 //Define variables that will help with troop selection and deployment
-let money = 1000;
+let money = 3000;
 let currentTroop = 1;
 const troops = {1: "Soldier", 2: "Sniper", 3: "Gunner", 4: "Rocket Launcher"};
 const costs = {1: 50, 2: 150, 3: 400, 4: 1000};
@@ -431,7 +431,7 @@ function onClickHandler(e) {
 
 document.addEventListener("click", onClickHandler, false);
 function slow(){
-    money += 10;
+    money += 50;
 }
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
