@@ -36,24 +36,10 @@ const round1 = [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Snipe
 const rounds = [
     [["Soldier",4]],
     [["Soldier",5],["Soldier",5],["Soldier",5],["Soldier",5], ["Sniper", 3], ["Sniper", 3]],
-    [["Gunner", 2],["Gunner",2], ["Gunner",2], ["Sniper", 5], ["Sniper",5]]
+    [["Gunner", 2],["Gunner",2], ["Gunner",2], ["Sniper", 5], ["Sniper",5]],
+    [["Gunner", 4],["Gunner",4], ["Gunner",5], ["Sniper", 10], ["Sniper",10]]
 ];
 let roundNumber = 1;
-
-
-/*
-Round 1:
-30 Soldiers
-
-Round 2:
-20 Soldiers, 10 Snipers
-
-Round 3: 10 Soldiers, 10 Snipers, 20 Gunners
-
-Round 4: 30 Gunners, 20 Snipers, 10 Rocket Launchers
-
-Round 5: 40 Gunners, 40 Rocket Launchers
- */
 
 //Image glow is defined here to prevent scope problems
 let glow;
